@@ -37,10 +37,8 @@ int main(int, char const**)
 
 	void Inputer(sf::RectangleShape &player);
 
-	//Store the window information
-	//c_Window myWindow(800, 600);
 
-	//std::cout << "\nScreen size thingy is :: " << myWindow.widthOfScreenMinusObjectsSize(100) << "\n";
+
 
 	// Create the main window
 	sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
@@ -116,7 +114,9 @@ int main(int, char const**)
 	sf::RectangleShape player(sf::Vector2f(100, 100));
 	player.setPosition(300, 300);
 	player.setFillColor(sf::Color::Blue);
-
+	
+	// location vector of player
+	sf::Vector2f playerWasAt;
 
 	//
 	// Wall test
@@ -178,6 +178,7 @@ int main(int, char const**)
 	// Start the game loop
 	while (window.isOpen())
 	{
+
 		// Process events
 		sf::Event event;
 		while (window.pollEvent(event))
@@ -192,7 +193,7 @@ int main(int, char const**)
 				window.close();
 			}
 			
-			sf::Vector2f playerWasAt;
+			// store the player's current position for collision check
 			playerWasAt.x = player.getPosition().x;
 			playerWasAt.y = player.getPosition().y;
 			//
@@ -201,9 +202,19 @@ int main(int, char const**)
 
 		}
 		//
+
+		//state machine here
+		//menu
+		//game
+		//end
+
+
+
+
+		//Beginning of the game state.
 		//Collision check
 		//WALLS
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 102; i++) {
 			//(wallBrick[i]);
 
 			if ((abs((int)player.getPosition().x - (int)wallBrick[i].getPosition().x) * 2 < ((int)player.getSize().x + (int)wallBrick[i].getGlobalBounds().width) &&
@@ -212,6 +223,7 @@ int main(int, char const**)
 				std::cout << "Wall1 i and Player collide\n";
 
 				//If there was a collision, undo player movement;
+				player.setPosition(playerWasAt.x, playerWasAt.y);
 
 			}
 		}
@@ -277,6 +289,7 @@ int main(int, char const**)
 
 		// Update the window
 		window.display();
+		//End of the Game State
 
 		myX++;
 	}
