@@ -1,347 +1,326 @@
-#define SFML_STATIC
+
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+
+// Here is a small helper for you ! Have a look.
+
+#include <stdlib.h>     /* abs */
 #include <iostream>
-#include <string>
 
 using namespace std;
 
-
-class Sprite
+class GHAnimatedSprite// : public sf::Sprite
 {
-public:
-	enum SpriteType
-	{
-		SPIKES, WALL, FIRE, DOOR, TREASURE, KEY, PLAYER
-	};
-private:
-	sf::Sprite m_sprite;
-	SpriteType m_type;
-	sf::Texture m_texture;
-	sf::IntRect m_rectangle;
 
 public:
-	Sprite(sf::Sprite sprite, SpriteType type, sf::Texture texture, sf::IntRect rectangle)
-	{
-		sf::Sprite m_sprite
-	}
-	void setTexture(sf::Texture texture); //bool resetRect = false
-	void setRectangle(sf::IntRect rectangle);
-	sf::Texture getTexture(SpriteType m_type);
-	sf::IntRect getRectangle(SpriteType m_type);
-	sf::Sprite generateSprite(SpriteType m_type);
-};
+	//Things we need to store
+	sf::Sprite sprite;
+	int currentFrame;
+	float timeSinceLastChange;
 
-: m_type(type), m_texture(texture), m_rectangle(rectangle)
 
-sf::Sprite Sprite::generateSprite(SpriteType m_type)
-{
-	sf::Sprite mySprite;
-	mySprite.setTexture();
-	mySprite.setTextureRect(sf::IntRect());
-}
+	//constructor
+	GHAnimatedSprite(sf::Texture & myTexture);
+	void Update(float timeSinceLastFrame);
 
-class SpriteGenerator : public Sprite
-{
-	sf::Vector2f m_position;
-public:
-	void setPosition(sf::Vector2f position);
-	sf::Vector2f getPosition();
+
 };
 
 
 
-
-
-
-
-
-
-
-
-
-sf::Texture Sprite::getTexture(SpriteType m_type)
+int main(int, char const**)
 {
-	switch (m_type)
+	//VIEW STUFF
+	sf::View view;
+	int myX = 0;
+
+	void Inputer(sf::RectangleShape &player);
+
+	//Store the window information
+	//c_Window myWindow(800, 600);
+
+	//std::cout << "\nScreen size thingy is :: " << myWindow.widthOfScreenMinusObjectsSize(100) << "\n";
+
+	// Create the main window
+	sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
+
+	// Set the Icon
+	sf::Image icon;
+	if (!icon.loadFromFile("icon.png")) 
 	{
-	case SPIKES:
-	{
-		sf::Texture spike;
-		spike.loadFromFile("SpikeSprite.png");
-		return spike;
-	}
-	case FIRE:
-	{
-		sf::Texture fire;
-		fire.loadFromFile("FireSprite.png");
-		return fire;
-	}
-	case WALL:
-	{
-		sf::Texture wall;
-		wall.loadFromFile("WallSprite.png");
-		return wall;
-	}
-	case DOOR:
-	{
-		sf::Texture door;
-		door.loadFromFile("DoorSprite.png");
-		return door;
-	}
-	case TREASURE:
-	{
-		sf::Texture treasure;
-		treasure.loadFromFile("TreasureSprite.png");
-		return treasure;
-	}
-	case KEY:
-	{
-		sf::Texture key;
-		key.loadFromFile("KeySprite.png");
-		return key;
-	}
-	case PLAYER:
-	{
-		sf::Texture player;
-		player.loadFromFile("PlayerSprite.png");
-		return player;
-	}
-	}
-}
-
-sf::IntRect Sprite::getRectangle(SpriteType m_type)
-{
-	switch (m_type)
-	{
-	case SPIKES:
-		return sf::IntRect(0, 0, 64, 64);
-	case FIRE:
-		return sf::IntRect(0, 0, 64, 64);
-	case WALL:
-		return sf::IntRect(0, 0, 64, 64);
-	case DOOR:
-		return sf::IntRect(0, 0, 64, 64);
-	case TREASURE:
-		return sf::IntRect(0, 0, 64, 64);
-	case KEY:
-		return sf::IntRect(0, 0, 64, 64);
-	case PLAYER:
-		return sf::IntRect(0, 0, 64, 64);
-	}
-}
-
-sf::Vector2f Sprite::getPosition()
-{
-	m_position;
-}
-
-void Sprite::setTexture(sf::Texture texture) //bool resetRect = false
-{
-	m_texture = texture;
-}
-
-void Sprite::setRectangle(sf::IntRect rectangle)
-{
-	m_rectangle = rectangle;
-}
-
-void Sprite::setPosition(sf::Vector2f position)
-{
-	m_position = position;
-}
-
-void clock(int frameNo)
-{
-
-}
-/*sf::Sprite Sprite::getSprite(SpriteType, sf::Texture m_texture) 
-{
-	//sf::Texture texture;
-	switch (m_type)
-	{
-	case SPIKES: 
-		if (!m_texture.loadFromFile("SpikeSprite.png"))
-		{
-			// error
-		}
-		return SpikeSprite.setTexture(m_texture);
-	}
-}
-
-class SpriteTime
-{
-public:
-	void FrameCounter(int frameNos);
-};
-
-class SpriteImages
-{
-public:
-	sf::Texture myTexture;
-	int myframeNo;
-	void FireSprite(sf::Texture tex, sf::IntRect pix, int frameNo);
-	void SpikeSprite(sf::Texture tex, sf::IntRect pix, int frameNo);
-};
-
-class SpriteDisplay
-{
-public:
-	int vecAx, vecBy;
-	//void SpriteTexture(sf::Texture texA, sf::Texture texB);
-	void SpriteVectors(int vecX, int vecY);
-	void SpriteImage(sf::Sprite si);
-};
-
-int main()
-{
-	sf::RenderWindow window(sf::VideoMode(800, 600), "SFML works!");
-	sf::CircleShape shape(100.f);
-	shape.setFillColor(sf::Color::Green);
-	
-	sf::Clock clock;
-	float elapsedAsfloat = 0;
-
-	int trapSpriteFrameCount = 0;
-
-	sf::Texture spike;
-	if (!spike.loadFromFile("SpikeSprite.png"))
-	{
-		// error
-	}
-
-	sf::Sprite spikeSprite;
-	spikeSprite.setTexture(spike);
-	spikeSprite.setTextureRect(sf::IntRect(0, 0, 64, 64));
-	spikeSprite.setPosition(sf::Vector2f(0, 115));
-
-	sf::Texture fire;
-	if (!fire.loadFromFile("FireSprite.png")) 
-	{
+		//return EXIT_FAILURE;
 		//error
 	}
+	window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
-	sf::Sprite fireSprite;
-	fireSprite.setTexture(fire);
-	fireSprite.setTextureRect(sf::IntRect(0, 0, 64, 64));
-	fireSprite.setPosition(sf::Vector2f(0, 50));
+	sf::Texture fire1Texture;
+	if (!fire1Texture.loadFromFile("FireSprite.png")) {
+		//return EXIT_FAILURE;
+		//error
+	}
+	//reference pointer to the texture
+	sf::Texture &ref_fire1Texture = fire1Texture;
+
+	//sf::Sprite fireTest(fire1Texture);
 
 
+
+	//
+	//GH Animated Sprite
+	GHAnimatedSprite ghSpriteFire(ref_fire1Texture);
+	ghSpriteFire.sprite.setPosition(200.0f, 200.0f);
+
+	sf::Clock clock1;
+	sf::Time elapsed1;
+	float timeSinceLastFrameAsFloat = 0.0f;
+	float lastTimeAsFloat = 0.0f;
+
+
+
+	//
+	// Load a sprite to display
+	sf::Texture texture;
+	if (!texture.loadFromFile("cute_image.png")) {
+		//return EXIT_FAILURE;
+		//error
+	}
+	sf::Sprite sprite(texture);
+	sprite.setScale(0.5f, 0.5f);
+
+
+	//
+	// Create a graphical text to display
+	sf::Font font;
+	if (!font.loadFromFile("sansation.png")) 
+	{
+		//return EXIT_FAILURE;
+	}
+	sf::Text text("Hello SFML", font, 50);
+	text.setColor(sf::Color::Black);
+
+
+	//
+	// Load a music to play
+	sf::Music music;
+	if (!music.openFromFile("TakeFive.mp3")) 
+	{
+		//return EXIT_FAILURE;
+	}
+	// Play the music
+	//music.play(); //TODO RE-ENABLE
+
+	sf::CircleShape circlePlayer(50);
+	circlePlayer.setFillColor(sf::Color(100,50,50));
+
+	sf::RectangleShape player(sf::Vector2f(100, 100));
+	player.setPosition(300, 300);
+	player.setFillColor(sf::Color::Blue);
+
+
+	//
+	//Wall test
+	sf::Texture wallBrickT;
+	wallBrickT.loadFromFile("WallBrick.png");
+	sf::Sprite wallBrick[5];
+
+	for (int i = 0; i < 4; i++) {
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(i * 64, 0);
+	}
+
+	wallBrick[2].setTexture(wallBrickT);
+	wallBrick[2].setPosition(200, 400);
+
+
+
+	// Start the game loop
 	while (window.isOpen())
 	{
+		// Process events
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
-			if (event.type == sf::Event::Closed)
+			// Close window: exit
+			if (event.type == sf::Event::Closed) {
 				window.close();
-		}
-
-		 // time
-		sf::Time elapsed1 = clock.getElapsedTime();
-		//cout << elapsed1.asSeconds() << endl;
-		elapsedAsfloat = elapsed1.asSeconds();
-
-		if (elapsedAsfloat > 0.2f) 
-		{
-
-			//cout << "Time is now higher than 0.2";
-
-			if (trapSpriteFrameCount < 3)
-			{
-				trapSpriteFrameCount++;
-			}
-			else
-			{
-				trapSpriteFrameCount = 0;
 			}
 
-			fireSprite.setTextureRect(sf::IntRect(64 * trapSpriteFrameCount, 0, 64, 64));
-			spikeSprite.setTextureRect(sf::IntRect(64 * trapSpriteFrameCount, 0, 64, 64));
+			// Escape pressed: exit
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+				window.close();
+			}
 
-			clock.restart();
+			//
+			// Input game
+			Inputer(player);
+
+		}
+		//
+		//Collision check
+		//WALLS
+		for (int i = 0; i < 3; i++) {
+			//(wallBrick[i]);
+
+			if ((abs((int)player.getPosition().x - (int)wallBrick[i].getPosition().x) * 2 < ((int)player.getSize().x + (int)wallBrick[i].getGlobalBounds().width) &&
+				(abs((int)player.getPosition().y - (int)wallBrick[i].getPosition().y) * 2 < ((int)player.getSize().y + (int)wallBrick[i].getGlobalBounds().height)))) {
+
+				std::cout << "Wall1 i and Player collide\n";
+
+				//If there was a collision, undo player movement;
+
+			}
 		}
 
-		
 
 
-		// black out the render window
+		//Collision check
+		//Fire
+		if ((abs((int)player.getPosition().x - (int)ghSpriteFire.sprite.getPosition().x) * 2 < ((int)player.getSize().x + (int)ghSpriteFire.sprite.getLocalBounds().width) &&
+			(abs((int)player.getPosition().y - (int)ghSpriteFire.sprite.getPosition().y) * 2 < ((int)player.getSize().y + (int)ghSpriteFire.sprite.getLocalBounds().height)))) {
+
+			std::cout << "FIRE and Player collide\n";
+
+			//If there was a collision, kill player ;
+
+		}
+
+
+
+		//Change the camera according to the player position
+		//view = window.getView();
+		view.setCenter(player.getPosition().x, player.getPosition().y);
+		window.setView(view);
+
+		//Timer here
+		elapsed1 = clock1.getElapsedTime();
+		timeSinceLastFrameAsFloat = elapsed1.asSeconds() - lastTimeAsFloat;
+		lastTimeAsFloat = elapsed1.asSeconds();
+
+
+		//Animated sprite updates (change frames)
+		ghSpriteFire.Update(timeSinceLastFrameAsFloat);
+
+
+
+		// Clear screen
 		window.clear();
-		// draw the shape
-		window.draw(shape);
-		window.draw(fireSprite);
-		window.draw(spikeSprite);
 
+		// Draw the background sprite
+		//window.draw(sprite);
+
+		// Draw the string
+		//window.draw(text);
+
+
+
+		window.draw(ghSpriteFire.sprite);
+
+
+		for (int i = 0; i < 4; i++) {
+			window.draw(wallBrick[i]);
+		}
+
+		window.draw(ghSpriteFire.sprite);
+
+
+		// Draw the player circle (last so it's on top)
+		window.draw(player);
+
+
+
+		// Update the window
 		window.display();
+
+		myX++;
 	}
 
+	//return EXIT_SUCCESS;
 	return 0;
 }
 
-void SpriteTime::FrameCounter(int frameNos)
-{
-	sf::Clock clock;
-	float elapsedAsfloat = 0;
-	sf::Time elapsed1 = clock.getElapsedTime();
-	elapsedAsfloat = elapsed1.asSeconds();
-	int spriteFrameCount = 0;
 
-	if (elapsedAsfloat > 0.2f)
-	{
-		if (spriteFrameCount < frameNos)
-		{
-			spriteFrameCount++;
+/*c_Window::c_Window(int width, int height) 
+{
+
+	w = width;
+	h = height;
+};
+
+float c_Window::widthOfScreenMinusObjectsSize(int size)
+{
+	return w - size;
+}; */
+
+
+void Inputer(sf::RectangleShape &player) {
+
+	// Check the boundry
+	int boundry[4] = { 0,
+		0,
+		700,
+		500 }; //TODO dynamically assign based on window size
+	sf::Vector2f pos = player.getPosition();
+
+	int velocity = 10;
+	// GH input
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+
+		std::cout << ("Left\n");
+		if (pos.x > boundry[0]) player.move(-velocity, 0);
+
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+
+		std::cout << ("Right\n");
+		if (pos.x < boundry[2]) player.move(velocity, 0);
+
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+
+		std::cout << ("Up\n");
+		if (pos.y > boundry[1]) player.move(0, -velocity);
+
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+
+		std::cout << ("Down\n");
+		if (pos.y < boundry[3]) player.move(0, velocity);
+
+	}
+
+}
+
+GHAnimatedSprite::GHAnimatedSprite(sf::Texture & myTexture) { //no void for contstrctpr
+	currentFrame = 0;
+	timeSinceLastChange = 0.0f;
+
+	sprite.setTexture(myTexture);
+	sprite.setTextureRect(sf::IntRect(64 * currentFrame, 0, 64, 64));
+
+
+}
+
+void GHAnimatedSprite::Update(float timeSinceLastFrame) {
+
+	timeSinceLastChange += timeSinceLastFrame;
+	if (timeSinceLastChange >= 0.25f) {
+
+		std::cout << "timer hits 0.25 seconds\n";
+		timeSinceLastChange = 0.0f; //reset the timer
+
+									//increment the frame counter
+		if (currentFrame >= 3) {
+			currentFrame = 0;
 		}
-		else
-		{
-			spriteFrameCount = 0;
+		else {
+			currentFrame++;
 		}
-		
-		clock.restart();
-	}
-}
 
-void SpriteImages::FireSprite(sf::Texture tex, sf::IntRect pix, int frameNo)
-{
-	if (!tex.loadFromFile("SpikeSprite.png"))
-	{
-		// error
-	}
-	pix = sf::IntRect(0, 0, 64, 64);
-	frameNo = 3;
-}
-
-void SpriteImages::SpikeSprite(sf::Texture tex, sf::IntRect pix, int frameNo)
-{
-	if (!tex.loadFromFile("FireSprite.png"))
-	{
-		//error
-	}
-	pix = sf::IntRect(0, 0, 64, 64);
-	frameNo = 1;
-}
-
-void SpriteDisplay::SpriteTexture(sf::Texture texA, sf::Texture texB)
-{
-	// sf::Texture texA;
-	if (!texA.loadFromFile("SpikeSprite.png"))
-	{
-		// error
+		//change the section of the texture
+		sprite.setTextureRect(sf::IntRect(64 * currentFrame, 0, 64, 64));
 	}
 
-	// sf::Texture texB;
-	if (!texB.loadFromFile("FireSprite.png"))
-	{
-		//error
-	}
-} 
 
-void SpriteDisplay::SpriteVectors(int vecX, int vecY)
-{
-	//vectors
-}
 
-void SpriteDisplay::SpriteImage(sf::Sprite si)
-{
-	// sf::Sprite si;
-	si.setTexture(spike);
-	si.setTextureRect(sf::IntRect(0, 0, 64, 64));
-	si.setPosition(sf::Vector2f(0, 115));
 }
