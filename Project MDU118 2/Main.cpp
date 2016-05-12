@@ -38,8 +38,9 @@ int main(int, char const**)
 	sf::View view;
 	int myX = 0;
 
-	//void Inputer(sf::RectangleShape &player);
+	// declare functions
 	void Inputer(sf::Sprite &playerSprite);
+	void Reset(sf::Sprite &playerSprite);
 
 
 
@@ -101,7 +102,7 @@ int main(int, char const**)
 	float timeSinceLastFrameAsFloat = 0.0f;
 	float lastTimeAsFloat = 0.0f;
 
-
+	// WELCOME PAGE
 	sf::Texture welcomeScreen;
 	if (welcomeScreen.loadFromFile("TitlePage.png"))
 	{
@@ -111,6 +112,17 @@ int main(int, char const**)
 	welcomePage.setTexture(welcomeScreen);
 	welcomePage.setTextureRect(sf::IntRect(0, 0, 800, 600));
 
+	/*
+	// GAME OVER SCREEN
+	sf::Texture gameOverT;
+	if (welcomeScreen.loadFromFile("GameOver.png"))
+	{
+		// error
+	}
+	sf::Sprite gameOver;
+	gameOver.setTexture(gameOverT);
+	gameOver.setTextureRect(sf::IntRect(0, 0, 800, 600));
+	*/
 	//
 	// Load a sprite to display
 	sf::Texture texture;
@@ -136,12 +148,12 @@ int main(int, char const**)
 	//
 	// Load a music to play
 	sf::Music music;
-	if (!music.openFromFile("TakeFive.mp3")) 
+	if (!music.openFromFile("Smb_under.ogg")) 
 	{
 		//return EXIT_FAILURE;
 	}
 	// Play the music
-	//music.play(); //TODO RE-ENABLE
+	music.play(); //TODO RE-ENABLE
 
 	sf::Texture playerSpriteT;
 	playerSpriteT.loadFromFile("PlayerSprite.png");
@@ -156,15 +168,11 @@ int main(int, char const**)
 	sf::CircleShape circlePlayer(50);
 	circlePlayer.setFillColor(sf::Color(100,50,50));
 
-	//sf::RectangleShape player(sf::Vector2f(100, 100));
-	//player.setPosition(300, 300);
-	//player.setFillColor(sf::Color::Blue);
 	
 	// location vector of player
 	sf::Vector2f playerWasAt;
 
-	//
-	// Wall test
+	// WALLS
 	sf::Texture wallBrickT;
 	wallBrickT.loadFromFile("WallBrick.png");
 	sf::Sprite wallBrick[102];
@@ -225,12 +233,14 @@ int main(int, char const**)
 		while (window.pollEvent(event))
 		{
 			// Close window: exit
-			if (event.type == sf::Event::Closed) {
+			if (event.type == sf::Event::Closed) 
+			{
 				window.close();
 			}
 
 			// Escape pressed: exit
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) 
+			{
 				window.close();
 			}
 			
@@ -247,11 +257,12 @@ int main(int, char const**)
 		switch(newGame)
 		{
 		case Welcome:
-
+			//cout << "start page";
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
 			{
 				newGame = Game;
 			}
+
 			window.clear();
 			window.draw(welcomePage);
 			window.display();
@@ -260,8 +271,7 @@ int main(int, char const**)
 		case Game:
 
 			//Beginning of the game state.
-			//Collision check
-			//WALLS
+			//Collision check - WALLS
 			for (int i = 0; i < 102; i++) 
 			{
 
@@ -269,7 +279,7 @@ int main(int, char const**)
 				if ((abs((int)playerSprite.getPosition().x - (int)wallBrick[i].getPosition().x) * 2 < ((int)playerSprite.getGlobalBounds().width + (int)wallBrick[i].getGlobalBounds().width) &&
 					(abs((int)playerSprite.getPosition().y - (int)wallBrick[i].getPosition().y) * 2 < ((int)playerSprite.getGlobalBounds().height + (int)wallBrick[i].getGlobalBounds().height)))) {
 
-					std::cout << "Wall1 i and Player collide\n";
+					cout << "Wall1 i and Player collide\n";
 
 					//If there was a collision, undo player movement;
 					playerSprite.setPosition(playerWasAt.x, playerWasAt.y);
@@ -278,17 +288,48 @@ int main(int, char const**)
 			}
 
 
-
-			//Collision check
-			//Fire
+			//Collision check - FIRE
 			if ((abs((int)playerSprite.getPosition().x - (int)ghSpriteFire.sprite.getPosition().x) * 2 < ((int)playerSprite.getGlobalBounds().width + (int)ghSpriteFire.sprite.getLocalBounds().width) &&
-				(abs((int)playerSprite.getPosition().y - (int)ghSpriteFire.sprite.getPosition().y) * 2 < ((int)playerSprite.getGlobalBounds().height + (int)ghSpriteFire.sprite.getLocalBounds().height)))) {
+				(abs((int)playerSprite.getPosition().y - (int)ghSpriteFire.sprite.getPosition().y) * 2 < ((int)playerSprite.getGlobalBounds().height + (int)ghSpriteFire.sprite.getLocalBounds().height))))
+			{
 
-				std::cout << "FIRE and Player collide\n";
+				cout << "FIRE and Player collide\n";
 
 				//If there was a collision, kill player ;
+				{
 
+					newGame = End;
+					Reset(playerSprite);
+				}
 			} 
+
+			//Collision check - SPIKES
+			if ((abs((int)playerSprite.getPosition().x - (int)ghSpriteSpike.sprite.getPosition().x) * 2 < ((int)playerSprite.getGlobalBounds().width + (int)ghSpriteSpike.sprite.getLocalBounds().width) &&
+				(abs((int)playerSprite.getPosition().y - (int)ghSpriteSpike.sprite.getPosition().y) * 2 < ((int)playerSprite.getGlobalBounds().height + (int)ghSpriteSpike.sprite.getLocalBounds().height)))) 
+			{
+
+				std::cout << "SPIKES and Player collide\n";
+
+				//If there was a collision, kill player ;
+				{
+					newGame = End;
+					Reset(playerSprite);
+				}
+			}
+
+			//Collision check - GHOST
+			if ((abs((int)playerSprite.getPosition().x - (int)ghSpriteGhost.sprite.getPosition().x) * 2 < ((int)playerSprite.getGlobalBounds().width + (int)ghSpriteGhost.sprite.getLocalBounds().width) &&
+				(abs((int)playerSprite.getPosition().y - (int)ghSpriteGhost.sprite.getPosition().y) * 2 < ((int)playerSprite.getGlobalBounds().height + (int)ghSpriteGhost.sprite.getLocalBounds().height))))
+			{
+
+				std::cout << "SPIKES and Player collide\n";
+
+				//If there was a collision, kill player ;
+				{
+					newGame = End;
+					Reset(playerSprite);
+				}
+			}
 
 
 
@@ -313,9 +354,7 @@ int main(int, char const**)
 			// Clear screen
 			window.clear();
 
-
-
-
+			// Draw sprites
 			window.draw(ghSpriteFire.sprite);
 			window.draw(ghSpriteSpike.sprite);
 			window.draw(ghSpriteGhost.sprite);
@@ -331,9 +370,8 @@ int main(int, char const**)
 			//window.draw(ghSpriteFire.sprite);
 
 
-			// Draw the player circle (last so it's on top)
+			// Draw the player (last so it's on top)
 			window.draw(playerSprite);
-
 
 
 			// Update the window
@@ -344,12 +382,16 @@ int main(int, char const**)
 			break;
 
 		case End:
+			//cout << "endgame";
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			{
+				newGame = Game;
+			}
+			window.clear();
+			window.display();
 			break;
 		}
-		//state machine here
-		//menu
-		//game
-		//end
+
 
 	}
 
@@ -395,6 +437,12 @@ void Inputer(sf::Sprite &playerSprite) {
 
 	}
 
+}
+
+void Reset(sf::Sprite &playerSprite)
+{
+	//welcomePage.setPosition(0, 0);
+	playerSprite.setPosition(64, 64);
 }
 
 GHAnimatedSprite::GHAnimatedSprite(sf::Texture & myTexture) { //no void for contstrctpr
