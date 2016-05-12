@@ -119,18 +119,59 @@ int main(int, char const**)
 
 
 	//
-	//Wall test
+	// Wall test
 	sf::Texture wallBrickT;
 	wallBrickT.loadFromFile("WallBrick.png");
-	sf::Sprite wallBrick[5];
+	sf::Sprite wallBrick[102];
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 12; i++) 
+	{
 		wallBrick[i].setTexture(wallBrickT);
 		wallBrick[i].setPosition(i * 64, 0);
 	}
+	for (int i = 13; i < 23; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(0, (i-12) * 64);
+	}
+	for (int i = 24; i < 31; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(704, (i - 23) * 64);
+	}
+	for (int i = 32; i < 48; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition((i - 31) * 64, 640);
+	}
+	for (int i = 49; i < 57; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(704 + (i - 48) * 64, 448);
+	}
+	for (int i = 58; i < 66; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(1088, 576 + (i - 57) * 64);
+	}
+	for (int i = 67; i < 79; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(1024 + (i - 66) * 64, 1152);
+	}
+	for (int i = 80; i < 92; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(1856, 384 + (i - 79) * 64);
+	}
+	for (int i = 93; i < 102; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(1216 + (i - 92) * 64, 448);
+	}
 
-	wallBrick[2].setTexture(wallBrickT);
-	wallBrick[2].setPosition(200, 400);
+	//wallBrick[2].setTexture(wallBrickT);
+	//allBrick[2].setPosition(200, 400);
 
 
 
@@ -150,7 +191,10 @@ int main(int, char const**)
 			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
 				window.close();
 			}
-
+			
+			sf::Vector2f playerWasAt;
+			playerWasAt.x = player.getPosition().x;
+			playerWasAt.y = player.getPosition().y;
 			//
 			// Input game
 			Inputer(player);
@@ -217,9 +261,11 @@ int main(int, char const**)
 		window.draw(ghSpriteFire.sprite);
 
 
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 102; i++) 
+		{
 			window.draw(wallBrick[i]);
 		}
+
 
 		window.draw(ghSpriteFire.sprite);
 
@@ -240,29 +286,17 @@ int main(int, char const**)
 }
 
 
-/*c_Window::c_Window(int width, int height) 
-{
-
-	w = width;
-	h = height;
-};
-
-float c_Window::widthOfScreenMinusObjectsSize(int size)
-{
-	return w - size;
-}; */
-
 
 void Inputer(sf::RectangleShape &player) {
 
 	// Check the boundry
 	int boundry[4] = { 0,
 		0,
-		700,
-		500 }; //TODO dynamically assign based on window size
+		4000,
+		4000 }; //TODO dynamically assign based on window size
 	sf::Vector2f pos = player.getPosition();
 
-	int velocity = 10;
+	int velocity = 20;
 	// GH input
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 
