@@ -27,10 +27,13 @@ public:
 
 };
 
+enum Gamestate {Welcome, Game, End};
 
 
 int main(int, char const**)
 {
+	Gamestate newGame = Welcome;
+
 	//VIEW STUFF
 	sf::View view;
 	int myX = 0;
@@ -53,7 +56,8 @@ int main(int, char const**)
 	window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 	sf::Texture fire1Texture;
-	if (!fire1Texture.loadFromFile("FireSprite.png")) {
+	if (!fire1Texture.loadFromFile("FireSprite.png")) 
+	{
 		//return EXIT_FAILURE;
 		//error
 	}
@@ -75,6 +79,14 @@ int main(int, char const**)
 	float lastTimeAsFloat = 0.0f;
 
 
+	sf::Texture welcomeScreen;
+	if (welcomeScreen.loadFromFile("TitlePage.png"))
+	{
+		// error
+	}
+	sf::Sprite welcomePage;
+	welcomePage.setTexture(welcomeScreen);
+	welcomePage.setTextureRect(sf::IntRect(0, 0, 800, 600));
 
 	//
 	// Load a sprite to display
@@ -203,95 +215,108 @@ int main(int, char const**)
 		}
 		//
 
+		switch(newGame)
+		{
+		case Welcome:
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+			{
+				newGame = Game;
+			}
+			window.clear();
+			window.draw(welcomePage);
+			window.display();
+			break;
+
+		case Game:
+
+			//Beginning of the game state.
+			//Collision check
+			//WALLS
+			for (int i = 0; i < 102; i++) 
+			{
+
+
+				if ((abs((int)player.getPosition().x - (int)wallBrick[i].getPosition().x) * 2 < ((int)player.getSize().x + (int)wallBrick[i].getGlobalBounds().width) &&
+					(abs((int)player.getPosition().y - (int)wallBrick[i].getPosition().y) * 2 < ((int)player.getSize().y + (int)wallBrick[i].getGlobalBounds().height)))) {
+
+					std::cout << "Wall1 i and Player collide\n";
+
+					//If there was a collision, undo player movement;
+					player.setPosition(playerWasAt.x, playerWasAt.y);
+
+				}
+			}
+
+
+
+			//Collision check
+			//Fire
+			if ((abs((int)player.getPosition().x - (int)ghSpriteFire.sprite.getPosition().x) * 2 < ((int)player.getSize().x + (int)ghSpriteFire.sprite.getLocalBounds().width) &&
+				(abs((int)player.getPosition().y - (int)ghSpriteFire.sprite.getPosition().y) * 2 < ((int)player.getSize().y + (int)ghSpriteFire.sprite.getLocalBounds().height)))) {
+
+				std::cout << "FIRE and Player collide\n";
+
+				//If there was a collision, kill player ;
+
+			}
+
+
+
+			//Change the camera according to the player position
+			//view = window.getView();
+			view.setCenter(player.getPosition().x, player.getPosition().y);
+			window.setView(view);
+
+			//Timer here
+			elapsed1 = clock1.getElapsedTime();
+			timeSinceLastFrameAsFloat = elapsed1.asSeconds() - lastTimeAsFloat;
+			lastTimeAsFloat = elapsed1.asSeconds();
+
+
+			//Animated sprite updates (change frames)
+			ghSpriteFire.Update(timeSinceLastFrameAsFloat);
+
+
+
+			// Clear screen
+			window.clear();
+
+
+
+
+			window.draw(ghSpriteFire.sprite);
+
+
+			for (int i = 0; i < 102; i++)
+			{
+				window.draw(wallBrick[i]);
+			}
+
+
+			window.draw(ghSpriteFire.sprite);
+
+
+			// Draw the player circle (last so it's on top)
+			window.draw(player);
+
+
+
+			// Update the window
+			window.display();
+			//End of the Game State
+
+			myX++;
+			break;
+
+		case End:
+			break;
+		}
 		//state machine here
 		//menu
 		//game
 		//end
 
-
-
-
-		//Beginning of the game state.
-		//Collision check
-		//WALLS
-		for (int i = 0; i < 102; i++) {
-			//(wallBrick[i]);
-
-			if ((abs((int)player.getPosition().x - (int)wallBrick[i].getPosition().x) * 2 < ((int)player.getSize().x + (int)wallBrick[i].getGlobalBounds().width) &&
-				(abs((int)player.getPosition().y - (int)wallBrick[i].getPosition().y) * 2 < ((int)player.getSize().y + (int)wallBrick[i].getGlobalBounds().height)))) {
-
-				std::cout << "Wall1 i and Player collide\n";
-
-				//If there was a collision, undo player movement;
-				player.setPosition(playerWasAt.x, playerWasAt.y);
-
-			}
-		}
-
-
-
-		//Collision check
-		//Fire
-		if ((abs((int)player.getPosition().x - (int)ghSpriteFire.sprite.getPosition().x) * 2 < ((int)player.getSize().x + (int)ghSpriteFire.sprite.getLocalBounds().width) &&
-			(abs((int)player.getPosition().y - (int)ghSpriteFire.sprite.getPosition().y) * 2 < ((int)player.getSize().y + (int)ghSpriteFire.sprite.getLocalBounds().height)))) {
-
-			std::cout << "FIRE and Player collide\n";
-
-			//If there was a collision, kill player ;
-
-		}
-
-
-
-		//Change the camera according to the player position
-		//view = window.getView();
-		view.setCenter(player.getPosition().x, player.getPosition().y);
-		window.setView(view);
-
-		//Timer here
-		elapsed1 = clock1.getElapsedTime();
-		timeSinceLastFrameAsFloat = elapsed1.asSeconds() - lastTimeAsFloat;
-		lastTimeAsFloat = elapsed1.asSeconds();
-
-
-		//Animated sprite updates (change frames)
-		ghSpriteFire.Update(timeSinceLastFrameAsFloat);
-
-
-
-		// Clear screen
-		window.clear();
-
-		// Draw the background sprite
-		//window.draw(sprite);
-
-		// Draw the string
-		//window.draw(text);
-
-
-
-		window.draw(ghSpriteFire.sprite);
-
-
-		for (int i = 0; i < 102; i++) 
-		{
-			window.draw(wallBrick[i]);
-		}
-
-
-		window.draw(ghSpriteFire.sprite);
-
-
-		// Draw the player circle (last so it's on top)
-		window.draw(player);
-
-
-
-		// Update the window
-		window.display();
-		//End of the Game State
-
-		myX++;
 	}
 
 	//return EXIT_SUCCESS;
