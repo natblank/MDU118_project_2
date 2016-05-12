@@ -38,7 +38,8 @@ int main(int, char const**)
 	sf::View view;
 	int myX = 0;
 
-	void Inputer(sf::RectangleShape &player);
+	//void Inputer(sf::RectangleShape &player);
+	void Inputer(sf::Sprite &playerSprite);
 
 
 
@@ -55,6 +56,7 @@ int main(int, char const**)
 	}
 	window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
+	// FIRE SPRITE
 	sf::Texture fire1Texture;
 	if (!fire1Texture.loadFromFile("FireSprite.png")) 
 	{
@@ -64,14 +66,35 @@ int main(int, char const**)
 	//reference pointer to the texture
 	sf::Texture &ref_fire1Texture = fire1Texture;
 
-	//sf::Sprite fireTest(fire1Texture);
 
+	// SPIKE SPRITE
+	sf::Texture spike1Texture;
+	if (!spike1Texture.loadFromFile("SpikeSprite.png"));
+	{
+		//error
+	}
+	// reference pointer to texture
+	sf::Texture &ref_spike1Texture = spike1Texture;
 
+	// GHOST SPRITE
+	sf::Texture ghost1Texture;
+	if (!ghost1Texture.loadFromFile("GhostSprite.png"));
+	{
+		//error
+	}
+	// reference pointer to texture
+	sf::Texture &ref_ghost1Texture = ghost1Texture;
 
 	//
 	//GH Animated Sprite
 	GHAnimatedSprite ghSpriteFire(ref_fire1Texture);
 	ghSpriteFire.sprite.setPosition(200.0f, 200.0f);
+
+	GHAnimatedSprite ghSpriteSpike(ref_spike1Texture);
+	ghSpriteSpike.sprite.setPosition(200.0f, 300.0f);
+
+	GHAnimatedSprite ghSpriteGhost(ref_ghost1Texture);
+	ghSpriteGhost.sprite.setPosition(200.0f, 400.0f);
 
 	sf::Clock clock1;
 	sf::Time elapsed1;
@@ -120,12 +143,22 @@ int main(int, char const**)
 	// Play the music
 	//music.play(); //TODO RE-ENABLE
 
+	sf::Texture playerSpriteT;
+	playerSpriteT.loadFromFile("PlayerSprite.png");
+	{
+		// error
+	}
+	sf::Sprite playerSprite;
+	playerSprite.setTexture(playerSpriteT);
+	playerSprite.setTextureRect(sf::IntRect(0, 0, 64, 64));
+	playerSprite.setPosition(64, 64);
+
 	sf::CircleShape circlePlayer(50);
 	circlePlayer.setFillColor(sf::Color(100,50,50));
 
-	sf::RectangleShape player(sf::Vector2f(100, 100));
-	player.setPosition(300, 300);
-	player.setFillColor(sf::Color::Blue);
+	//sf::RectangleShape player(sf::Vector2f(100, 100));
+	//player.setPosition(300, 300);
+	//player.setFillColor(sf::Color::Blue);
 	
 	// location vector of player
 	sf::Vector2f playerWasAt;
@@ -182,10 +215,6 @@ int main(int, char const**)
 		wallBrick[i].setPosition(1216 + (i - 92) * 64, 448);
 	}
 
-	//wallBrick[2].setTexture(wallBrickT);
-	//allBrick[2].setPosition(200, 400);
-
-
 
 	// Start the game loop
 	while (window.isOpen())
@@ -206,11 +235,11 @@ int main(int, char const**)
 			}
 			
 			// store the player's current position for collision check
-			playerWasAt.x = player.getPosition().x;
-			playerWasAt.y = player.getPosition().y;
+			playerWasAt.x = playerSprite.getPosition().x;
+			playerWasAt.y = playerSprite.getPosition().y;
 			//
 			// Input game
-			Inputer(player);
+			Inputer(playerSprite);
 
 		}
 		//
@@ -237,13 +266,13 @@ int main(int, char const**)
 			{
 
 
-				if ((abs((int)player.getPosition().x - (int)wallBrick[i].getPosition().x) * 2 < ((int)player.getSize().x + (int)wallBrick[i].getGlobalBounds().width) &&
-					(abs((int)player.getPosition().y - (int)wallBrick[i].getPosition().y) * 2 < ((int)player.getSize().y + (int)wallBrick[i].getGlobalBounds().height)))) {
+				if ((abs((int)playerSprite.getPosition().x - (int)wallBrick[i].getPosition().x) * 2 < ((int)playerSprite.getGlobalBounds().width + (int)wallBrick[i].getGlobalBounds().width) &&
+					(abs((int)playerSprite.getPosition().y - (int)wallBrick[i].getPosition().y) * 2 < ((int)playerSprite.getGlobalBounds().height + (int)wallBrick[i].getGlobalBounds().height)))) {
 
 					std::cout << "Wall1 i and Player collide\n";
 
 					//If there was a collision, undo player movement;
-					player.setPosition(playerWasAt.x, playerWasAt.y);
+					playerSprite.setPosition(playerWasAt.x, playerWasAt.y);
 
 				}
 			}
@@ -252,20 +281,20 @@ int main(int, char const**)
 
 			//Collision check
 			//Fire
-			if ((abs((int)player.getPosition().x - (int)ghSpriteFire.sprite.getPosition().x) * 2 < ((int)player.getSize().x + (int)ghSpriteFire.sprite.getLocalBounds().width) &&
-				(abs((int)player.getPosition().y - (int)ghSpriteFire.sprite.getPosition().y) * 2 < ((int)player.getSize().y + (int)ghSpriteFire.sprite.getLocalBounds().height)))) {
+			if ((abs((int)playerSprite.getPosition().x - (int)ghSpriteFire.sprite.getPosition().x) * 2 < ((int)playerSprite.getGlobalBounds().width + (int)ghSpriteFire.sprite.getLocalBounds().width) &&
+				(abs((int)playerSprite.getPosition().y - (int)ghSpriteFire.sprite.getPosition().y) * 2 < ((int)playerSprite.getGlobalBounds().height + (int)ghSpriteFire.sprite.getLocalBounds().height)))) {
 
 				std::cout << "FIRE and Player collide\n";
 
 				//If there was a collision, kill player ;
 
-			}
+			} 
 
 
 
 			//Change the camera according to the player position
 			//view = window.getView();
-			view.setCenter(player.getPosition().x, player.getPosition().y);
+			view.setCenter(playerSprite.getPosition().x, playerSprite.getPosition().y);
 			window.setView(view);
 
 			//Timer here
@@ -276,6 +305,8 @@ int main(int, char const**)
 
 			//Animated sprite updates (change frames)
 			ghSpriteFire.Update(timeSinceLastFrameAsFloat);
+			ghSpriteSpike.Update(timeSinceLastFrameAsFloat);
+			ghSpriteGhost.Update(timeSinceLastFrameAsFloat);
 
 
 
@@ -286,6 +317,9 @@ int main(int, char const**)
 
 
 			window.draw(ghSpriteFire.sprite);
+			window.draw(ghSpriteSpike.sprite);
+			window.draw(ghSpriteGhost.sprite);
+
 
 
 			for (int i = 0; i < 102; i++)
@@ -294,11 +328,11 @@ int main(int, char const**)
 			}
 
 
-			window.draw(ghSpriteFire.sprite);
+			//window.draw(ghSpriteFire.sprite);
 
 
 			// Draw the player circle (last so it's on top)
-			window.draw(player);
+			window.draw(playerSprite);
 
 
 
@@ -325,39 +359,39 @@ int main(int, char const**)
 
 
 
-void Inputer(sf::RectangleShape &player) {
+void Inputer(sf::Sprite &playerSprite) {
 
 	// Check the boundry
 	int boundry[4] = { 0,
 		0,
 		4000,
 		4000 }; //TODO dynamically assign based on window size
-	sf::Vector2f pos = player.getPosition();
+	sf::Vector2f pos = playerSprite.getPosition();
 
 	int velocity = 20;
 	// GH input
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 
 		std::cout << ("Left\n");
-		if (pos.x > boundry[0]) player.move(-velocity, 0);
+		if (pos.x > boundry[0]) playerSprite.move(-velocity, 0);
 
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
 
 		std::cout << ("Right\n");
-		if (pos.x < boundry[2]) player.move(velocity, 0);
+		if (pos.x < boundry[2]) playerSprite.move(velocity, 0);
 
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
 
 		std::cout << ("Up\n");
-		if (pos.y > boundry[1]) player.move(0, -velocity);
+		if (pos.y > boundry[1]) playerSprite.move(0, -velocity);
 
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
 
 		std::cout << ("Down\n");
-		if (pos.y < boundry[3]) player.move(0, velocity);
+		if (pos.y < boundry[3]) playerSprite.move(0, velocity);
 
 	}
 
