@@ -2,6 +2,7 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include <sstream>
 
 // Here is a small helper for you ! Have a look.
 
@@ -30,6 +31,12 @@ public:
 
 enum Gamestate {Welcome, Game, End};
 
+string toString(int myInt)
+{
+	ostringstream os;
+	os << myInt;
+	return os.str();
+}
 
 int main(int, char const**)
 {
@@ -40,7 +47,7 @@ int main(int, char const**)
 	int myX = 0;
 
 	// declare functions
-	void Inputer(sf::Sprite &playerSprite);
+	void Inputer(sf::Sprite &playerSprite, float deltaTime);
 	void Reset(sf::Sprite &playerSprite);
 	void Patrol(GHAnimatedSprite &ghSpriteGhost);
 	void KeyCaught(GHAnimatedSprite &ghSpriteKey);
@@ -127,7 +134,32 @@ int main(int, char const**)
 
 
 
+	bool haveTreasure[3];
+	for (int i = 0; i < 3; i++)
+	{
+		haveTreasure[i] = false;
+	}
+	int treasureCount = 0;
+	sf::Font font;
+	if (!font.loadFromFile("pixel.ttf"))
+	{
+		return EXIT_FAILURE;
+	}
+	sf::Text treasureText;
+	treasureText.setString("TREASURE:  " + toString(treasureCount));
+	treasureText.setFont(font);
+	treasureText.setCharacterSize(45);
+	treasureText.setColor(sf::Color::Yellow);
+
 	bool haveKey = false;
+	int keyCount = 0;
+	sf::Text keyText;
+	keyText.setString("KEYS:  " + toString(keyCount));
+	keyText.setFont(font);
+	keyText.setCharacterSize(45);
+	keyText.setColor(sf::Color::Yellow);
+
+	bool moveRight = false;
 
 
 	// clock variables for animated sprite frame rate
@@ -167,6 +199,16 @@ int main(int, char const**)
 	// Play the music
 	music.play(); //TODO RE-ENABLE
 
+	sf::Texture collectedKeyT;
+	collectedKeyT.loadFromFile("SuccessKey.png");
+	{
+		//error
+	}
+	sf::Sprite collectedKey;
+	collectedKey.setTexture(collectedKeyT);
+	collectedKey.setTextureRect(sf::IntRect(0, 0, 64, 64));
+	collectedKey.setPosition(0, 536);
+
 	sf::Texture playerSpriteT;
 	playerSpriteT.loadFromFile("PlayerSprite.png");
 	{
@@ -177,6 +219,24 @@ int main(int, char const**)
 	playerSprite.setTextureRect(sf::IntRect(0, 0, 64, 64));
 	playerSprite.setPosition(64, 64);
 
+	sf::Texture treasureSpriteT;
+	treasureSpriteT.loadFromFile("TreasureSprite.png");
+	{
+		//error
+	}
+	sf::Sprite treasureSprite[3];
+	for (int i = 0; i < 3; i++)
+	{
+		treasureSprite[i].setTexture(treasureSpriteT);
+		treasureSprite[i].setTextureRect(sf::IntRect(0, 0, 64, 64));
+		treasureSprite[0].setPosition(1408, 128);
+		treasureSprite[1].setPosition(1408, 256);
+		treasureSprite[2].setPosition(1152, 128);
+	}
+	//treasureSprite.setTexture(treasureSpriteT);
+	//treasureSprite.setTextureRect(sf::IntRect(0, 0, 64, 64));
+	//treasureSprite.setPosition(1408, 128);
+
 	
 	// location vector of player
 	sf::Vector2f playerWasAt;
@@ -184,7 +244,7 @@ int main(int, char const**)
 	// WALLS
 	sf::Texture wallBrickT;
 	wallBrickT.loadFromFile("WallBrick.png");
-	sf::Sprite wallBrick[102];
+	sf::Sprite wallBrick[130];
 
 	for (int i = 0; i < 12; i++) 
 	{
@@ -206,32 +266,56 @@ int main(int, char const**)
 		wallBrick[i].setTexture(wallBrickT);
 		wallBrick[i].setPosition((i - 31) * 64, 640);
 	}
-	for (int i = 49; i < 57; i++)
+	for (int i = 49; i < 55; i++)
 	{
 		wallBrick[i].setTexture(wallBrickT);
 		wallBrick[i].setPosition(704 + (i - 48) * 64, 448);
 	}
-	for (int i = 58; i < 66; i++)
+	for (int i = 56; i < 64; i++)
 	{
 		wallBrick[i].setTexture(wallBrickT);
-		wallBrick[i].setPosition(1088, 576 + (i - 57) * 64);
+		wallBrick[i].setPosition(1088, 576 + (i - 55) * 64);
 	}
-	for (int i = 67; i < 79; i++)
+	for (int i = 65; i < 77; i++)
 	{
 		wallBrick[i].setTexture(wallBrickT);
-		wallBrick[i].setPosition(1024 + (i - 66) * 64, 1152);
+		wallBrick[i].setPosition(1024 + (i - 64) * 64, 1152);
 	}
-	for (int i = 80; i < 92; i++)
+	for (int i = 78; i < 90; i++)
 	{
 		wallBrick[i].setTexture(wallBrickT);
-		wallBrick[i].setPosition(1856, 384 + (i - 79) * 64);
+		wallBrick[i].setPosition(1856, 384 + (i - 77) * 64);
 	}
-	for (int i = 93; i < 102; i++)
+	for (int i = 91; i < 100; i++)
 	{
 		wallBrick[i].setTexture(wallBrickT);
-		wallBrick[i].setPosition(1216 + (i - 92) * 64, 448);
+		wallBrick[i].setPosition(1216 + (i - 90) * 64, 448);
 	}
-
+	for (int i = 101; i < 108; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(1088, (i - 101) * 64);
+	}
+	for (int i = 109; i < 112; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(1280, 320 + (i - 109) * 64);
+	}
+	for (int i = 113; i < 117; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(1344 + (i - 113) * 64, 320);
+	}
+	for (int i = 118; i < 125; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(1152 + (i - 118) * 64, 0);
+	}
+	for (int i = 126; i < 130; i++)
+	{
+		wallBrick[i].setTexture(wallBrickT);
+		wallBrick[i].setPosition(1536, 64 + (i - 126) * 64);
+	}
 
 	// Start the game loop
 	while (window.isOpen())
@@ -258,10 +342,11 @@ int main(int, char const**)
 			playerWasAt.y = playerSprite.getPosition().y;
 			//
 			// Input game
-			Inputer(playerSprite);
 
 		}
 		//
+
+
 
 		switch(newGame)
 		{
@@ -279,9 +364,16 @@ int main(int, char const**)
 
 		case Game:
 
+			Inputer(playerSprite, timeSinceLastFrameAsFloat);
+			keyText.setString("KEYS:  " + toString(keyCount));
+			treasureText.setString("TREASURE:  " + toString(treasureCount));
+
 			//Beginning of the game state.
 			//Collision check - WALLS
-			for (int i = 0; i < 102; i++) 
+			keyText.setPosition(playerSprite.getPosition().x - 500, playerSprite.getPosition().y - 520);
+			treasureText.setPosition(playerSprite.getPosition().x - 500, playerSprite.getPosition().y - 480);
+
+			for (int i = 0; i < 130; i++) 
 			{
 
 
@@ -307,7 +399,6 @@ int main(int, char const**)
 
 					//If there was a collision, kill player ;
 					newGame = End;
-					Reset(playerSprite);
 
 				}
 			}
@@ -323,7 +414,6 @@ int main(int, char const**)
 
 					//If there was a collision, kill player ;
 					newGame = End;
-					Reset(playerSprite);
 				}
 
 			}
@@ -338,7 +428,6 @@ int main(int, char const**)
 
 				//If there was a collision, kill player ;
 				newGame = End;
-				Reset(playerSprite);
 			}
 
 			//Collision check - KEY
@@ -352,14 +441,56 @@ int main(int, char const**)
 				
 				haveKey = true;
 				cout << "sprite key now true\n";
+				keyCount = 1;
 				
 			}
 
+			//Collision check - TREASURE
+			for (int i = 0; i < 3; i++)
+			{
+				if ((abs((int)playerSprite.getPosition().x - (int)treasureSprite[i].getPosition().x) * 2 < ((int)playerSprite.getGlobalBounds().width + (int)treasureSprite[i].getLocalBounds().width) &&
+					(abs((int)playerSprite.getPosition().y - (int)treasureSprite[i].getPosition().y) * 2 < ((int)playerSprite.getGlobalBounds().height + (int)treasureSprite[i].getLocalBounds().height))))
+				{
+					haveTreasure[i] = true;
+					//cout << "KEY and Player collide\n";
 
+					//If there was a collision, kill player ;
+
+					//haveTreasure = true;
+					cout << "treasure now true\n";
+					treasureCount = 1;
+				}
+			}
+
+
+			// ghost patrol
+			if(moveRight) {
+
+				ghSpriteGhost.sprite.move(64 * timeSinceLastFrameAsFloat, 0);
+				
+
+				if (ghSpriteGhost.sprite.getPosition().x > 320)
+				{
+					moveRight = false;
+				}
+
+			}
+			
+			if (!moveRight) {
+				ghSpriteGhost.sprite.move(-64 * timeSinceLastFrameAsFloat, 0);
+
+				if (ghSpriteGhost.sprite.getPosition().x < 64)
+				{
+					moveRight = true;
+				}
+			}
+
+			
 
 			//Change the camera according to the player position
 			//view = window.getView();
 			view.setCenter(playerSprite.getPosition().x, playerSprite.getPosition().y);
+			
 			window.setView(view);
 
 			//Timer here
@@ -393,15 +524,24 @@ int main(int, char const**)
 
 
 			window.draw(ghSpriteGhost.sprite);
+
 			if (haveKey == false)
 			{
 				window.draw(ghSpriteKey.sprite);
 			}
 
+			for (int i = 0; i < 3; i++)
+			{
+				if (haveTreasure[i] == false)
+				{
+					window.draw(treasureSprite[i]);
+				}
+			}
 
 
 
-			for (int i = 0; i < 102; i++)
+
+			for (int i = 0; i < 130; i++)
 			{
 				window.draw(wallBrick[i]);
 			}
@@ -417,12 +557,15 @@ int main(int, char const**)
 			}
 
 
+
 			//window.draw(ghSpriteFire.sprite);
 
 
 			// Draw the player (last so it's on top)
 			window.draw(playerSprite);
-
+			
+			window.draw(keyText);
+			window.draw(treasureText);
 
 			// Update the window
 			window.display();
@@ -433,6 +576,11 @@ int main(int, char const**)
 
 		case End:
 			//cout << "endgame";
+			playerSprite.setPosition(64, 64);
+			//haveTreasure = false;
+			haveKey = false;
+			treasureCount = 0;
+			keyCount = 0;
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 			{
 				newGame = Game;
@@ -451,7 +599,7 @@ int main(int, char const**)
 
 
 
-void Inputer(sf::Sprite &playerSprite) {
+void Inputer(sf::Sprite &playerSprite, float deltaTime) {
 
 	// Check the boundry
 	int boundry[4] = { 0,
@@ -460,7 +608,10 @@ void Inputer(sf::Sprite &playerSprite) {
 		4000 }; //TODO dynamically assign based on window size
 	sf::Vector2f pos = playerSprite.getPosition();
 
-	int velocity = 50;
+	float velocity = 500.0f * deltaTime;
+	//std::cout << deltaTime << std::endl;
+	//cout << velocity << std::endl;
+
 	// GH input
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) 
 	{
@@ -484,11 +635,6 @@ void Inputer(sf::Sprite &playerSprite) {
 	}
 }
 
-void Reset(sf::Sprite &playerSprite)
-{
-	//welcomePage.setPosition(0, 0);
-	playerSprite.setPosition(64, 64);
-}
 
 
 GHAnimatedSprite::GHAnimatedSprite(sf::Texture & myTexture) 
@@ -514,7 +660,7 @@ void GHAnimatedSprite::Update(float timeSinceLastFrame)
 	timeSinceLastChange += timeSinceLastFrame;
 	if (timeSinceLastChange >= 0.25f) {
 
-		cout << "timer hits 0.25 seconds\n";
+		//cout << "timer hits 0.25 seconds\n";
 		timeSinceLastChange = 0.0f; //reset the timer
 
 									//increment the frame counter
